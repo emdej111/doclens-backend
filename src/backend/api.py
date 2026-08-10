@@ -32,6 +32,12 @@ from src.backend.schemas import (
 
 app = FastAPI(title="DocLens API", version="1.0.0")
 
+print(
+    f"[DocLens startup] ANTHROPIC_API_KEY present: {bool(settings.anthropic_api_key)}, "
+    f"length: {len(settings.anthropic_api_key)}",
+    flush=True,
+)
+
 # Streamlit runs on a different port during local dev.
 app.add_middleware(
     CORSMiddleware,
