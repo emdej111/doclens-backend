@@ -31,55 +31,56 @@ the deployed demo above uses a separate React frontend that talks to this same A
 
 ## Project structure
 
+```
 doclens/
 ├── requirements.txt
 ├── .env.example
-├── CLAUDE.md # architecture & conventions for contributors
+├── CLAUDE.md              # architecture & conventions for contributors
 ├── README.md
 ├── src/
-│ ├── backend/
-│ │ ├── api.py # FastAPI app and routes
-│ │ ├── config.py # env-based settings
-│ │ ├── pdf_utils.py # PDF text extraction
-│ │ ├── rag.py # chunking + TF-IDF retrieval
-│ │ ├── claude_client.py # summary + Q&A calls to Claude
-│ │ └── schemas.py # request/response models
-│ └── frontend/
-│ └── app.py # Streamlit UI
+│   ├── backend/
+│   │   ├── api.py         # FastAPI app and routes
+│   │   ├── config.py      # env-based settings
+│   │   ├── pdf_utils.py   # PDF text extraction
+│   │   ├── rag.py         # chunking + TF-IDF retrieval
+│   │   ├── claude_client.py  # summary + Q&A calls to Claude
+│   │   └── schemas.py     # request/response models
+│   └── frontend/
+│       └── app.py         # Streamlit UI
 └── tests/
-└── test_rag.py
-
+    └── test_rag.py
+```
 
 ## Setup
 
 1. **Clone and install dependencies**
 
-```bash
+   ```bash
    pip install -r requirements.txt
-```
+   ```
 
 2. **Configure your API key**
 
-```bash
+   ```bash
    cp .env.example .env
-```
+   ```
 
    Edit `.env` and set `ANTHROPIC_API_KEY` to a key from
    [console.anthropic.com](https://console.anthropic.com/).
 
 3. **Run the backend** (terminal 1)
 
-```bash
+   ```bash
    uvicorn src.backend.api:app --reload
-```
+   ```
 
    The API is now live at `http://localhost:8000` (docs at `/docs`).
 
 4. **Run the frontend** (terminal 2)
 
-```bash
+   ```bash
    streamlit run src/frontend/app.py
-```
+   ```
 
    Open the URL Streamlit prints (usually `http://localhost:8501`).
 
@@ -121,10 +122,18 @@ for the reasoning and when it'd be worth swapping in real embeddings.
 
 The API is deployed on [Railway](https://railway.app), which runs it via the `Procfile`:
 
+```
 web: uvicorn src.backend.api:app --host 0.0.0.0 --port $PORT
-
+```
 
 `ANTHROPIC_API_KEY` and the other settings are set as Railway environment variables (never
 committed — see `.gitignore`). Because there's no database, every redeploy or restart clears
 whatever documents were uploaded in that session; this is expected for a single-user demo, not a
 bug.
+
+Since the live API sits behind a public, unauthenticated link, its Anthropic API spend is capped
+with a hard monthly limit in the Anthropic Console. If that cap is reached, requests fail
+gracefully — the frontend detects this and switches to a demo mode with mock data rather than
+showing a broken UI.
+
+
