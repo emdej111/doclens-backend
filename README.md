@@ -1,12 +1,19 @@
 # DocLens
 
+[![Tests](https://github.com/emdej111/doclens-backend/actions/workflows/tests.yml/badge.svg)](https://github.com/emdej111/doclens-backend/actions/workflows/tests.yml)
+
 An AI document analyzer: upload a PDF, get a summary, then ask questions about it. Answers are
 grounded in the document via a lightweight retrieval step over its own text — no vector database
 required.
 
+> Built using AI-assisted development (Claude for architecture and implementation) — reflecting a
+> modern development workflow where AI tools accelerate implementation while the developer owns
+> architecture, integration, and product decisions. See [Notes](#notes) for the trade-offs made
+> along the way.
+
 **🔗 Live demo (React frontend):** https://emdej111-doclens-ai-chat.emdej111.workers.dev
 **🖥️ Frontend repo:** https://github.com/emdej111/doclens-ai-chat
-**⚙️ Live API:** https://web-production-238efa.up.railway.app/api/health
+**⚙️ Live API:** https://web-copy-production-e12e.up.railway.app/api/health
 
 This repo is the backend — it also ships a Streamlit UI for local/standalone use (see below), but
 the deployed demo above uses a separate React frontend that talks to this same API.
@@ -135,5 +142,6 @@ Since the live API sits behind a public, unauthenticated link, its Anthropic API
 with a hard monthly limit in the Anthropic Console. If that cap is reached, requests fail
 gracefully — the frontend detects this and switches to a demo mode with mock data rather than
 showing a broken UI.
+
 
 
