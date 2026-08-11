@@ -35,7 +35,10 @@ def generate_summary(document_text: str) -> str:
             "user provides in 3-5 short paragraphs or a tight bullet list. Lead "
             "with what the document is and its purpose, then cover the key "
             "points, findings, or sections. Be concise and factual — don't "
-            "speculate about content that isn't in the text."
+            "speculate about content that isn't in the text. Respond in plain "
+            "text only: no markdown formatting (no #, ##, **, -, or similar "
+            "syntax), since the output is displayed as-is without a markdown "
+            "renderer."
         ),
         messages=[
             {
@@ -63,7 +66,10 @@ def answer_question(question: str, context_chunks: list[str]) -> str:
             "You are a document Q&A assistant. Answer the user's question using "
             "only the excerpts provided below — they were retrieved from a larger "
             "document as the most relevant sections. If the excerpts don't contain "
-            "enough information to answer, say so plainly rather than guessing."
+            "enough information to answer, say so plainly rather than guessing. "
+            "Respond in plain text only: no markdown formatting (no #, ##, **, -, "
+            "or similar syntax), since the output is displayed as-is without a "
+            "markdown renderer."
         ),
         messages=[
             {
@@ -78,3 +84,4 @@ def answer_question(question: str, context_chunks: list[str]) -> str:
 
 def _extract_text(response: anthropic.types.Message) -> str:
     return "".join(block.text for block in response.content if block.type == "text").strip()
+
