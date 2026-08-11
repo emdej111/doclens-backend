@@ -15,9 +15,11 @@ Two processes, talking over plain HTTP:
 - **Backend** (`src/backend/`) — FastAPI. Owns PDF parsing, chunking, retrieval, and all calls to
   the Claude API. Stateful only in memory (`DOCUMENT_STORE` in `api.py`) — there is no database.
   Restarting the backend drops every uploaded document.
-- **Frontend** (`src/frontend/`) — Streamlit. A thin client that calls the backend's `/api/*`
-  endpoints via `requests`. It holds no document text itself, only `document_id` and display state
-  in `st.session_state`.
+- **Frontend** (`src/frontend/`) — Streamlit. A local/standalone thin client that calls the
+  backend's `/api/*` endpoints via `requests`. It holds no document text itself, only
+  `document_id` and display state in `st.session_state`. The deployed, public-facing UI is a
+  separate React app ([doclens-ai-chat](https://github.com/emdej111/doclens-ai-chat)) that talks
+  to this same backend — Streamlit is kept for local development and standalone use.
 
 The frontend never imports from `src/backend` and never calls the Anthropic SDK directly — every
 AI call goes through the backend. Keep it that way; it's what lets the backend be swapped for a
@@ -90,7 +92,19 @@ streamlit run src/frontend/app.py
 
 ## Tests
 
-`tests/test_rag.py` covers chunking and TF-IDF retrieval — the parts with no external
-dependencies. There are no tests against the live Anthropic API or a running FastAPI server;
-`pdf_utils.py` and `claude_client.py` are thin enough that they're better exercised by hand while
-developing. Run with `pytest`.
+Five test files cover the backend end to end:
+
+- `tests/test_rag.py` — chunking and TF-IDF retrieval
+- `tests/test_pdf_utils.py` — PDF text extraction
+- `tests/test_claude_client.py` — summary/Q&A prompt construction, with the Anthropic client
+  mocked (no real API calls, no cost)
+- `tests/test_schemas.py` — Pydantic request/response validation
+- `tests/test_api.py` — the FastAPI endpoints themselves via `TestClient`, covering the full
+  upload → ask → list → delete flow and error cases (non-PDF upload, unknown document, etc.)
+
+Nothing here calls the live Anthropic API or needs a running server — `claude_client` is mocked
+in `test_api.py` and `test_claude_client.py` via `monkeypatch`. Run with:
+
+```bash
+PYTHONPATH=. pytest tests/ -v
+```
